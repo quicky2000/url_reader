@@ -6,41 +6,59 @@
 namespace quicky_url_reader
 {
   //------------------------------------------------------------------------------
-  url_reader::url_reader(void):
-    m_curl_handler(NULL)
+  url_reader::url_reader(void)
   {
-    std::cout << "Init libcurl" << std::endl ;
-    if(curl_global_init(CURL_GLOBAL_ALL))
+    if(!m_nb_instance)
       {
-	std::cout << "Problem with curl initialisation" << std::endl ;
-	exit(-1);
+        std::cout << "Init libcurl" << std::endl ;
+        if(curl_global_init(CURL_GLOBAL_ALL))
+          {
+            std::cout << "Problem with curl initialisation" << std::endl ;
+            exit(-1);
+          }
+        m_curl_handler = curl_easy_init();
+        curl_easy_setopt(m_curl_handler, CURLOPT_WRITEFUNCTION,url_reader::receive_data); 
       }
-    m_curl_handler = curl_easy_init();
+    ++m_nb_instance;
+  }
+
+  //------------------------------------------------------------------------------
+  void url_reader::set_authentication(const std::string & p_proxy,
+                          const std::string & p_proxy_port,
+                          const std::string & p_user,
+                          const std::string & p_password)
+  {
+    curl_easy_setopt(m_curl_handler, CURLOPT_PROXY, (p_proxy+":"+p_proxy_port).c_str()); 
+    curl_easy_setopt(m_curl_handler, CURLOPT_PROXYUSERPWD,(p_user+":"+p_password).c_str());
   }
 
   //------------------------------------------------------------------------------
   url_reader::~url_reader(void)
   {
-    curl_easy_cleanup(m_curl_handler);
-    curl_global_cleanup();
-    std::cout << "libcurl cleanup done" << std::endl ;
-  }
-
-  //------------------------------------------------------------------------------
-  url_reader & url_reader::get_instance(void)
-  {
-    if(m_instance == NULL)
+    --m_nb_instance;
+    if(!m_nb_instance)
       {
-	m_instance = new url_reader();
+        curl_easy_cleanup(m_curl_handler);
+        curl_global_cleanup();
+        std::cout << "libcurl cleanup done" << std::endl ;
       }
-    return *m_instance;
   }
 
-  //------------------------------------------------------------------------------
-  void url_reader::remove_instance(void)
-  {
-    delete m_instance;
-  }
+  //TO DELETE  //------------------------------------------------------------------------------
+  //TO DELETE  url_reader & url_reader::get_instance(void)
+  //TO DELETE  {
+  //TO DELETE    if(m_instance == NULL)
+  //TO DELETE      {
+  //TO DELETE	m_instance = new url_reader();
+  //TO DELETE      }
+  //TO DELETE    return *m_instance;
+  //TO DELETE  }
+
+  //TO DELETE  //------------------------------------------------------------------------------
+  //TO DELETE  void url_reader::remove_instance(void)
+  //TO DELETE  {
+  //TO DELETE    delete m_instance;
+  //TO DELETE  }
 
   //------------------------------------------------------------------------------
   char * url_reader::escape_string(const char * p_str)
@@ -53,14 +71,12 @@ namespace quicky_url_reader
   {
     std::cout << "URL is \"" << p_url << "\"" << std::endl ;
     curl_easy_setopt(m_curl_handler, CURLOPT_URL, p_url);
-    curl_easy_setopt(m_curl_handler, CURLOPT_WRITEFUNCTION,url_reader::receive_data); 
     curl_easy_setopt(m_curl_handler, CURLOPT_WRITEDATA, (void *)&p_buffer);
-    //  curl_easy_setopt(m_curl_handler, CURLOPT_PROXY, "url:port"); 
-    //  curl_easy_setopt(m_curl_handler, CURLOPT_PROXYUSERPWD, "login:motdepasse");
     CURLcode res = curl_easy_perform(m_curl_handler);
     if(res)
       {
 	std::cout << "Error when downloading \"" << p_url << "\"" << std::endl ;
+	exit(EXIT_FAILURE);
       }
   }
 
@@ -77,6 +93,9 @@ namespace quicky_url_reader
   
   }
 
-  url_reader * url_reader::m_instance = NULL;
+  //TO DELETE  url_reader * url_reader::m_instance = NULL;
+  CURL * url_reader::m_curl_handler = NULL;
+  uint32_t url_reader::m_nb_instance = 0;
+  url_reader url_reader::m_instance;
 }
 //EOF
