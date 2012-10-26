@@ -1,8 +1,7 @@
 #include "url_reader.h"
 #include "download_buffer.h"
 #include <iostream>
-#include <stdlib.h>
-
+#include <cstdlib>
 namespace quicky_url_reader
 {
   //------------------------------------------------------------------------------
@@ -28,8 +27,10 @@ namespace quicky_url_reader
                           const std::string & p_user,
                           const std::string & p_password)
   {
-    curl_easy_setopt(m_curl_handler, CURLOPT_PROXY, (p_proxy+":"+p_proxy_port).c_str()); 
-    curl_easy_setopt(m_curl_handler, CURLOPT_PROXYUSERPWD,(p_user+":"+p_password).c_str());
+    m_proxy = p_proxy+":"+p_proxy_port;
+    m_proxy_userpwd = p_user+":"+p_password ;
+    curl_easy_setopt(m_curl_handler, CURLOPT_PROXY, m_proxy.c_str());
+    curl_easy_setopt(m_curl_handler, CURLOPT_PROXYUSERPWD,m_proxy_userpwd.c_str());
   }
 
   //------------------------------------------------------------------------------
@@ -94,6 +95,8 @@ namespace quicky_url_reader
   }
 
   //TO DELETE  url_reader * url_reader::m_instance = NULL;
+  std::string url_reader::m_proxy;
+  std::string url_reader::m_proxy_userpwd;
   CURL * url_reader::m_curl_handler = NULL;
   uint32_t url_reader::m_nb_instance = 0;
   url_reader url_reader::m_instance;

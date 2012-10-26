@@ -21,7 +21,8 @@ namespace quicky_url_reader
                             const std::string & p_password);
   private:
     static size_t receive_data(void *p_buffer, size_t p_size, size_t p_nmemb, void *p_userp);
-
+    static std::string m_proxy;
+    static std::string m_proxy_userpwd;
     static CURL * m_curl_handler;
     static url_reader m_instance;
     static uint32_t m_nb_instance;
