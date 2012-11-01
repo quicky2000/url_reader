@@ -1,6 +1,7 @@
 #include "url_reader.h"
 #include "download_buffer.h"
 #include <iostream>
+#include <fstream>
 #include <cstdlib>
 namespace quicky_url_reader
 {
@@ -45,22 +46,6 @@ namespace quicky_url_reader
       }
   }
 
-  //TO DELETE  //------------------------------------------------------------------------------
-  //TO DELETE  url_reader & url_reader::get_instance(void)
-  //TO DELETE  {
-  //TO DELETE    if(m_instance == NULL)
-  //TO DELETE      {
-  //TO DELETE	m_instance = new url_reader();
-  //TO DELETE      }
-  //TO DELETE    return *m_instance;
-  //TO DELETE  }
-
-  //TO DELETE  //------------------------------------------------------------------------------
-  //TO DELETE  void url_reader::remove_instance(void)
-  //TO DELETE  {
-  //TO DELETE    delete m_instance;
-  //TO DELETE  }
-
   //------------------------------------------------------------------------------
   char * url_reader::escape_string(const char * p_str)
   {
@@ -82,6 +67,44 @@ namespace quicky_url_reader
   }
 
   //------------------------------------------------------------------------------
+  void url_reader::dump_url(const std::string & p_url,std::string & p_result)
+  {
+    download_buffer l_buffer;
+    this->read_url(p_url.c_str(),l_buffer);
+    p_result = std::string(l_buffer.get_data(),l_buffer.get_size());
+  }
+
+  //------------------------------------------------------------------------------
+  void url_reader::dump_url(const std::string & p_url,const std::string & p_file_name)
+  {
+    download_buffer l_buffer;
+    this->read_url(p_url.c_str(),l_buffer);
+    std::ofstream l_output_file(p_file_name.c_str());
+    if(l_output_file==NULL)
+      {
+	std::cout << "ERROR : Unable to open output file \"" << p_file_name << "\"" << std::endl ;
+	exit(EXIT_FAILURE);
+      }
+    l_output_file.write(l_buffer.get_data(),l_buffer.get_size());
+    l_output_file.close();
+  }
+
+ //------------------------------------------------------------------------------
+  void url_reader::dump_url_binary(const std::string & p_url,const std::string & p_file_name)
+  {
+    download_buffer l_buffer;
+    this->read_url(p_url.c_str(),l_buffer);
+    std::ofstream l_output_file(p_file_name.c_str(),std::ios::out | std::ios::binary);
+    if(l_output_file==NULL)
+      {
+	std::cout << "ERROR : Unable to open output file \"" << p_file_name << "\"" << std::endl ;
+	exit(EXIT_FAILURE);
+      }
+    l_output_file.write(l_buffer.get_data(),l_buffer.get_size());
+    l_output_file.close();
+  }
+
+  //------------------------------------------------------------------------------
   size_t url_reader::receive_data(void *p_buffer, size_t p_size, size_t p_nmemb, void *p_userp)
   {
     size_t l_real_size = p_size * p_nmemb ;
@@ -94,7 +117,12 @@ namespace quicky_url_reader
   
   }
 
-  //TO DELETE  url_reader * url_reader::m_instance = NULL;
+  //------------------------------------------------------------------------------
+  url_reader & url_reader::instance(void)
+  {
+    return m_instance;
+  }
+
   std::string url_reader::m_proxy;
   std::string url_reader::m_proxy_userpwd;
   CURL * url_reader::m_curl_handler = NULL;
