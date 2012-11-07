@@ -32,7 +32,7 @@ namespace quicky_url_reader
     void dump_url(const std::string & p_url, const std::string & p_file_name);
     void dump_url_binary(const std::string & p_url, const std::string & p_file_name);
     void read_url(const char * p_url,download_buffer & p_buffer);
-    char * escape_string(const char * p_str);
+    static char * escape_string(const char * p_str);
     url_reader(void);
     ~url_reader(void);
     static url_reader & instance(void);
