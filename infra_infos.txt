@@ -1,4 +1,4 @@
-depend:EXT_libcurl
+depend:EXT_libcurl quicky_exception
 CFLAGS:-Wall -g
 LDFLAGS:
 

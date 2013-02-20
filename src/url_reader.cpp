@@ -16,10 +16,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 #include "url_reader.h"
+#include "quicky_exception.h"
 #include "download_buffer.h"
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
+#include <sstream>
+
 namespace quicky_url_reader
 {
   //------------------------------------------------------------------------------
@@ -27,11 +30,12 @@ namespace quicky_url_reader
   {
     if(!m_nb_instance)
       {
+#ifdef DEBUG_URL_READER
         std::cout << "Init libcurl" << std::endl ;
+#endif
         if(curl_global_init(CURL_GLOBAL_ALL))
           {
-            std::cout << "Problem with curl initialisation" << std::endl ;
-            exit(-1);
+	    throw quicky_exception::quicky_runtime_exception("Problem with curl initialisation",__LINE__,__FILE__);
           }
         m_curl_handler = curl_easy_init();
         curl_easy_setopt(m_curl_handler, CURLOPT_WRITEFUNCTION,url_reader::receive_data); 
@@ -59,7 +63,9 @@ namespace quicky_url_reader
       {
         curl_easy_cleanup(m_curl_handler);
         curl_global_cleanup();
+#ifdef DEBUG_URL_READER
         std::cout << "libcurl cleanup done" << std::endl ;
+#endif
       }
   }
 
@@ -72,14 +78,14 @@ namespace quicky_url_reader
   //------------------------------------------------------------------------------
   void url_reader::read_url(const char * p_url,download_buffer & p_buffer)
   {
-    std::cout << "URL is \"" << p_url << "\"" << std::endl ;
     curl_easy_setopt(m_curl_handler, CURLOPT_URL, p_url);
     curl_easy_setopt(m_curl_handler, CURLOPT_WRITEDATA, (void *)&p_buffer);
     CURLcode res = curl_easy_perform(m_curl_handler);
     if(res)
       {
-	std::cout << "Error when downloading \"" << p_url << "\"" << std::endl ;
-	exit(EXIT_FAILURE);
+	std::stringstream l_stream;
+	l_stream << "Error when downloading \"" << p_url << "\"" ;
+	throw quicky_exception::quicky_runtime_exception(l_stream.str(),__LINE__,__FILE__);
       }
   }
 
@@ -99,8 +105,9 @@ namespace quicky_url_reader
     std::ofstream l_output_file(p_file_name.c_str());
     if(l_output_file==NULL)
       {
-	std::cout << "ERROR : Unable to open output file \"" << p_file_name << "\"" << std::endl ;
-	exit(EXIT_FAILURE);
+	std::stringstream l_stream;
+	l_stream << "ERROR : Unable to open output file \"" << p_file_name << "\"" ;
+	throw quicky_exception::quicky_runtime_exception(l_stream.str(),__LINE__,__FILE__);
       }
     l_output_file.write(l_buffer.get_data(),l_buffer.get_size());
     l_output_file.close();
@@ -114,8 +121,9 @@ namespace quicky_url_reader
     std::ofstream l_output_file(p_file_name.c_str(),std::ios::out | std::ios::binary);
     if(l_output_file==NULL)
       {
-	std::cout << "ERROR : Unable to open output file \"" << p_file_name << "\"" << std::endl ;
-	exit(EXIT_FAILURE);
+	std::stringstream l_stream;
+	l_stream << "ERROR : Unable to open output file \"" << p_file_name << "\"" ;
+	throw quicky_exception::quicky_runtime_exception(l_stream.str(),__LINE__,__FILE__);
       }
     l_output_file.write(l_buffer.get_data(),l_buffer.get_size());
     l_output_file.close();
