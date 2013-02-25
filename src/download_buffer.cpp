@@ -16,6 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 #include "download_buffer.h"
+#include "quicky_exception.h"
 #include <stdlib.h>
 #include <iostream>
 #include <string.h>
@@ -29,8 +30,7 @@ namespace quicky_url_reader
   {
     if(m_data==NULL)
       {
-	std::cout << "Not enough memory to allocate buffer" << std::endl;
-	exit(EXIT_FAILURE);
+	throw quicky_exception::quicky_runtime_exception("Not enough memory to allocate download buffer",__LINE__,__FILE__);
       }
   }
 
@@ -49,8 +49,7 @@ namespace quicky_url_reader
     m_data = (char*)realloc(m_data,m_size + p_size + 1);
     if(m_data == NULL)
       {
-	std::cout << "Not enough memory to extend buffer" << std::endl;
-	exit(EXIT_FAILURE);      
+	throw quicky_exception::quicky_runtime_exception("Not enough memory to extend download buffer",__LINE__,__FILE__);
       }
     // Copy the new data in the buffer
     memcpy(&(m_data[m_size]), p_data, p_size);
