@@ -22,6 +22,7 @@
 #include <fstream>
 #include <cstdlib>
 #include <sstream>
+#include <unistd.h>
 
 namespace quicky_url_reader
 {
@@ -38,7 +39,6 @@ namespace quicky_url_reader
 	    throw quicky_exception::quicky_runtime_exception("Problem with curl initialisation",__LINE__,__FILE__);
           }
         m_curl_handler = curl_easy_init();
-        curl_easy_setopt(m_curl_handler, CURLOPT_WRITEFUNCTION,url_reader::receive_data); 
       }
     ++m_nb_instance;
   }
@@ -78,6 +78,7 @@ namespace quicky_url_reader
   //------------------------------------------------------------------------------
   void url_reader::read_url(const char * p_url,download_buffer & p_buffer)
   {
+    curl_easy_setopt(m_curl_handler, CURLOPT_WRITEFUNCTION,url_reader::receive_data); 
     curl_easy_setopt(m_curl_handler, CURLOPT_URL, p_url);
     curl_easy_setopt(m_curl_handler, CURLOPT_WRITEDATA, (void *)&p_buffer);
     CURLcode res = curl_easy_perform(m_curl_handler);
@@ -130,6 +131,21 @@ namespace quicky_url_reader
   }
 
   //------------------------------------------------------------------------------
+  void url_reader::dump_url(const std::string & p_url,int fd)
+  {
+    curl_easy_setopt(m_curl_handler, CURLOPT_WRITEFUNCTION,url_reader::receive_data_fd); 
+    curl_easy_setopt(m_curl_handler, CURLOPT_URL, p_url.c_str());
+    curl_easy_setopt(m_curl_handler, CURLOPT_WRITEDATA, (uintptr_t)fd);
+    CURLcode res = curl_easy_perform(m_curl_handler);
+    if(res)
+      {
+	std::stringstream l_stream;
+	l_stream << "Error when downloading \"" << p_url << "\"" ;
+	throw quicky_exception::quicky_runtime_exception(l_stream.str(),__LINE__,__FILE__);
+      }
+  }
+
+  //------------------------------------------------------------------------------
   size_t url_reader::receive_data(void *p_buffer, size_t p_size, size_t p_nmemb, void *p_userp)
   {
     size_t l_real_size = p_size * p_nmemb ;
@@ -138,6 +154,19 @@ namespace quicky_url_reader
 #endif
     download_buffer * l_buffer = (download_buffer*) p_userp;
     l_buffer->add_data(l_real_size,p_buffer);
+    return p_size*p_nmemb;
+  
+  }
+
+  //------------------------------------------------------------------------------
+  size_t url_reader::receive_data_fd(void *p_buffer, size_t p_size, size_t p_nmemb, void *p_userp)
+  {
+    size_t l_real_size = p_size * p_nmemb ;
+#ifdef DEBUG_URL_READER
+    std::cout << "url_reader::receive data of size " << l_real_size << std::endl ;
+#endif
+    int fd = (intptr_t) p_userp;
+    write(fd,p_buffer,l_real_size);;
     return p_size*p_nmemb;
   
   }

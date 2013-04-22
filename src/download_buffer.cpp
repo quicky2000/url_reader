@@ -26,7 +26,7 @@ namespace quicky_url_reader
   //------------------------------------------------------------------------------
   download_buffer::download_buffer(void):
     m_size(0),
-    m_data((char*)malloc(1))
+    m_data((char*)malloc(1024))
   {
     if(m_data==NULL)
       {

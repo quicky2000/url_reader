@@ -32,10 +32,26 @@ namespace quicky_url_reader
   class url_reader
   {
   public:
+    /**
+       Dump URL Content inside a string
+     **/
     void dump_url(const std::string & p_url,std::string & p_result);
+    /**
+       Dump URL content inside a file opened in text mode
+    **/
     void dump_url(const std::string & p_url, const std::string & p_file_name);
+    /**
+       Dump URL content inside a file opened in binary mode
+    **/
     void dump_url_binary(const std::string & p_url, const std::string & p_file_name);
+    /**
+       Dump URL content inside a download buffer
+    **/
     void read_url(const char * p_url,download_buffer & p_buffer);
+    /**
+       Dump URL content inside a file defined by its file descriptor
+    **/
+    void dump_url(const std::string & p_url,int fd);
     static char * escape_string(const char * p_str);
     url_reader(void);
     ~url_reader(void);
@@ -45,7 +61,14 @@ namespace quicky_url_reader
                             const std::string & p_user,
                             const std::string & p_password);
   private:
-    static size_t receive_data(void *p_buffer, size_t p_size, size_t p_nmemb, void *p_userp);
+    static size_t receive_data(void *p_buffer,
+			       size_t p_size, 
+			       size_t p_nmemb,
+			       void *p_userp);
+    static size_t receive_data_fd(void *p_buffer,
+				  size_t p_size, 
+				  size_t p_nmemb,
+				  void *p_userp);
     static std::string m_proxy;
     static std::string m_proxy_userpwd;
     static CURL * m_curl_handler;
