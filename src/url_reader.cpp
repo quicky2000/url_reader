@@ -104,7 +104,7 @@ namespace quicky_url_reader
     download_buffer l_buffer;
     this->read_url(p_url.c_str(),l_buffer);
     std::ofstream l_output_file(p_file_name.c_str());
-    if(l_output_file==NULL)
+    if(!l_output_file.is_open())
       {
 	std::stringstream l_stream;
 	l_stream << "ERROR : Unable to open output file \"" << p_file_name << "\"" ;
@@ -120,7 +120,7 @@ namespace quicky_url_reader
     download_buffer l_buffer;
     this->read_url(p_url.c_str(),l_buffer);
     std::ofstream l_output_file(p_file_name.c_str(),std::ios::out | std::ios::binary);
-    if(l_output_file==NULL)
+    if(!l_output_file.is_open())
       {
 	std::stringstream l_stream;
 	l_stream << "ERROR : Unable to open output file \"" << p_file_name << "\"" ;
