@@ -23,6 +23,7 @@
 #include <cstdlib>
 #include <sstream>
 #include <unistd.h>
+#include <cassert>
 
 namespace quicky_url_reader
 {
@@ -180,6 +181,84 @@ namespace quicky_url_reader
   url_reader & url_reader::instance(void)
   {
     return m_instance;
+  }
+
+  //------------------------------------------------------------------------------
+  void url_reader::connect(const std::string & p_login_url,
+			   const std::string & p_post_login_url,
+			   const std::string & p_post_field_begin,
+			   const std::string & p_post_field_end,
+			   const std::string & p_login_token_id,
+			   bool p_verbose,
+			   bool p_verbose_content)
+  {
+    curl_easy_setopt(m_curl_handler, CURLOPT_COOKIESESSION,true);
+    curl_easy_setopt(m_curl_handler, CURLOPT_COOKIEFILE,"toto.txt");
+    curl_easy_setopt(m_curl_handler,CURLOPT_FOLLOWLOCATION,true);
+    download_buffer l_buffer;
+    curl_easy_setopt(m_curl_handler, CURLOPT_WRITEFUNCTION,receive_data);
+    curl_easy_setopt(m_curl_handler, CURLOPT_WRITEDATA, (void *)&l_buffer);
+    curl_easy_setopt(m_curl_handler, CURLOPT_URL,p_login_url.c_str());
+    if(p_verbose)
+      {
+	curl_easy_setopt(m_curl_handler, CURLOPT_VERBOSE,1);
+      }
+
+    CURLcode l_curl_status = curl_easy_perform(m_curl_handler);
+    if(l_curl_status)
+      {
+	std::stringstream l_stream;
+	l_stream << "Error when downloading \"" << p_login_url << "\" : " << curl_easy_strerror(l_curl_status);
+	throw quicky_exception::quicky_runtime_exception(l_stream.str(),__LINE__,__FILE__);
+      }
+
+    // Extract login token
+    std::string l_content(l_buffer.get_data(),l_buffer.get_size());
+    size_t l_pos = l_content.find(p_login_token_id);
+    assert(std::string::npos != l_pos);
+    l_pos = l_content.find("value",l_pos);
+    assert(std::string::npos != l_pos);
+    l_pos += std::string("value").size();
+    l_pos = l_content.find('"',l_pos);
+    assert(std::string::npos != l_pos);
+    ++l_pos;
+    size_t l_pos_end = l_content.find('"',l_pos);
+
+    if(p_verbose_content)
+      {
+	std::cout << l_content << std::endl ;
+      }
+    std::string l_login_token = l_content.substr(l_pos,l_pos_end - l_pos);
+
+    // Connection
+    std::string l_post_fields = p_post_field_begin + l_login_token + p_post_field_end;
+
+    curl_easy_setopt(m_curl_handler, CURLOPT_POST, true);
+    curl_easy_setopt(m_curl_handler, CURLOPT_POSTFIELDS,l_post_fields.c_str());
+    curl_easy_setopt(m_curl_handler, CURLOPT_POSTREDIR, CURL_REDIR_POST_ALL);
+    curl_easy_setopt(m_curl_handler, CURLOPT_URL,p_post_login_url.c_str());
+
+    l_buffer.clear();
+    l_curl_status = curl_easy_perform(m_curl_handler);
+    if(l_curl_status)
+      {
+	std::stringstream l_stream;
+	l_stream << "Error when downloading \"" << p_post_login_url << "\" : " << curl_easy_strerror(l_curl_status);
+	throw quicky_exception::quicky_runtime_exception(l_stream.str(),__LINE__,__FILE__);
+      }
+
+    l_content = std::string(l_buffer.get_data(),l_buffer.get_size());
+    if(p_verbose_content)
+      {
+	std::cout << "-------------------------------------------------------------" << std::endl ;
+	std::cout << "Content of page after logging" << std::endl;
+	std::cout << l_content << std::endl ;
+      }
+    if(std::string::npos != l_content.find("Incorrect ID or password"))
+      {
+	throw quicky_exception::quicky_logic_exception("Connection failed !!! Please check your credentials",__LINE__,__FILE__);
+      }
+
   }
 
   std::string url_reader::m_proxy;

@@ -48,6 +48,18 @@ namespace quicky_url_reader
        Dump URL content inside a file defined by its file descriptor
     **/
     void dump_url(const std::string & p_url,int fd);
+
+    /**
+       Connect to a website
+    **/
+    void connect(const std::string & p_login_url,
+		 const std::string & p_post_login_url,
+		 const std::string & p_post_field_begin,
+		 const std::string & p_post_field_end,
+		 const std::string & p_login_token_id,
+		 bool p_verbose,
+		 bool p_verbose_content);
+
     static char * escape_string(const char * p_str);
     url_reader(void);
     ~url_reader(void);
