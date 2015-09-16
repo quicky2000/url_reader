@@ -17,11 +17,7 @@
 */
 #ifndef _URL_READER_H_
 #define _URL_READER_H_
-#ifdef _WIN32
-#include "curl/curl.h"
-#else
 #include <curl/curl.h>
-#endif // _WIN32
 #include <string>
 #include <inttypes.h>
 
