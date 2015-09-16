@@ -45,14 +45,19 @@ namespace quicky_url_reader
 
   //------------------------------------------------------------------------------
   void url_reader::set_authentication(const std::string & p_proxy,
-                          const std::string & p_proxy_port,
-                          const std::string & p_user,
-                          const std::string & p_password)
+				      const std::string & p_proxy_port,
+				      const std::string & p_user,
+				      const std::string & p_password,
+				      bool p_disable_ssl_check)
   {
     m_proxy = p_proxy+":"+p_proxy_port;
     m_proxy_userpwd = p_user+":"+p_password ;
     curl_easy_setopt(m_curl_handler, CURLOPT_PROXY, m_proxy.c_str());
     curl_easy_setopt(m_curl_handler, CURLOPT_PROXYUSERPWD,m_proxy_userpwd.c_str());
+    if(p_disable_ssl_check)
+      {
+	curl_easy_setopt(m_curl_handler, CURLOPT_SSL_VERIFYPEER, false);
+      }
   }
 
   //------------------------------------------------------------------------------

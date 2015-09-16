@@ -55,7 +55,8 @@ namespace quicky_url_reader
     void set_authentication(const std::string & p_proxy,
                             const std::string & p_proxy_port,
                             const std::string & p_user,
-                            const std::string & p_password);
+                            const std::string & p_password,
+			    bool p_disable_ssl_check=false);
   private:
     static size_t receive_data(void *p_buffer,
 			       size_t p_size, 
