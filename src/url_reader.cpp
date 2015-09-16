@@ -90,7 +90,7 @@ namespace quicky_url_reader
     if(res)
       {
 	std::stringstream l_stream;
-	l_stream << "Error when downloading \"" << p_url << "\"" ;
+	l_stream << "Error when downloading \"" << p_url << "\" : " << curl_easy_strerror(res);
 	throw quicky_exception::quicky_runtime_exception(l_stream.str(),__LINE__,__FILE__);
       }
   }
@@ -145,7 +145,7 @@ namespace quicky_url_reader
     if(res)
       {
 	std::stringstream l_stream;
-	l_stream << "Error when downloading \"" << p_url << "\"" ;
+	l_stream << "Error when downloading \"" << p_url << "\" : " << curl_easy_strerror(res);
 	throw quicky_exception::quicky_runtime_exception(l_stream.str(),__LINE__,__FILE__);
       }
   }
