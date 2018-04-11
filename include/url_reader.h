@@ -23,67 +23,103 @@
 
 namespace quicky_url_reader
 {
-  class download_buffer;
+    class download_buffer;
 
-  class url_reader
-  {
-  public:
-    /**
-       Dump URL Content inside a string
-     **/
-    void dump_url(const std::string & p_url,std::string & p_result);
-    /**
-       Dump URL content inside a file opened in text mode
-    **/
-    void dump_url(const std::string & p_url, const std::string & p_file_name);
-    /**
-       Dump URL content inside a file opened in binary mode
-    **/
-    void dump_url_binary(const std::string & p_url, const std::string & p_file_name);
-    /**
-       Dump URL content inside a download buffer
-    **/
-    void read_url(const char * p_url,download_buffer & p_buffer);
-    /**
-       Dump URL content inside a file defined by its file descriptor
-    **/
-    void dump_url(const std::string & p_url,int fd);
+    class url_reader
+    {
+      public:
+        /**
+           Dump URL Content inside a string
+         **/
+        void
+        dump_url(const std::string & p_url,
+                 std::string & p_result
+                );
 
-    /**
-       Connect to a website
-    **/
-    void connect(const std::string & p_login_url,
-		 const std::string & p_post_login_url,
-		 const std::string & p_post_field_begin,
-		 const std::string & p_post_field_end,
-		 const std::string & p_login_token_id,
-		 bool p_verbose,
-		 bool p_verbose_content);
+        /**
+           Dump URL content inside a file opened in text mode
+        **/
+        void
+        dump_url(const std::string & p_url,
+                 const std::string & p_file_name
+                );
 
-    static char * escape_string(const char * p_str);
-    url_reader(void);
-    ~url_reader(void);
-    static url_reader & instance(void);
-    void set_authentication(const std::string & p_proxy,
-                            const std::string & p_proxy_port,
-                            const std::string & p_user,
-                            const std::string & p_password,
-			    bool p_disable_ssl_check=false);
-  private:
-    static size_t receive_data(void *p_buffer,
-			       size_t p_size, 
-			       size_t p_nmemb,
-			       void *p_userp);
-    static size_t receive_data_fd(void *p_buffer,
-				  size_t p_size, 
-				  size_t p_nmemb,
-				  void *p_userp);
-    static std::string m_proxy;
-    static std::string m_proxy_userpwd;
-    static CURL * m_curl_handler;
-    static url_reader m_instance;
-    static uint32_t m_nb_instance;
-  };
+        /**
+           Dump URL content inside a file opened in binary mode
+        **/
+        void
+        dump_url_binary(const std::string & p_url,
+                        const std::string & p_file_name
+                       );
+
+        /**
+           Dump URL content inside a download buffer
+        **/
+        void
+        read_url(const char *p_url,
+                 download_buffer & p_buffer
+                );
+
+        /**
+           Dump URL content inside a file defined by its file descriptor
+        **/
+        void
+        dump_url(const std::string & p_url,
+                 int fd
+                );
+
+        /**
+           Connect to a website
+        **/
+        void
+        connect(const std::string & p_login_url,
+                const std::string & p_post_login_url,
+                const std::string & p_post_field_begin,
+                const std::string & p_post_field_end,
+                const std::string & p_login_token_id,
+                bool p_verbose,
+                bool p_verbose_content
+               );
+
+        static char *
+        escape_string(const char *p_str);
+
+        url_reader(void);
+
+        ~url_reader(void);
+
+        static url_reader &
+        instance(void);
+
+        void
+        set_authentication(const std::string & p_proxy,
+                           const std::string & p_proxy_port,
+                           const std::string & p_user,
+                           const std::string & p_password,
+                           bool p_disable_ssl_check = false
+                          );
+
+      private:
+        static size_t
+        receive_data(void *p_buffer,
+                     size_t p_size,
+                     size_t p_nmemb,
+                     void *p_userp
+                    );
+
+        static size_t
+        receive_data_fd(void *p_buffer,
+                        size_t p_size,
+                        size_t p_nmemb,
+                        void *p_userp
+                       );
+
+        static std::string m_proxy;
+        static std::string m_proxy_userpwd;
+        static CURL *m_curl_handler;
+        static url_reader m_instance;
+        static uint32_t m_nb_instance;
+    };
 }
 #endif /* _URL_READER_H_ */
 //EOF

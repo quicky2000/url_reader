@@ -23,58 +23,75 @@
 
 namespace quicky_url_reader
 {
-  //------------------------------------------------------------------------------
-  download_buffer::download_buffer(void):
-    m_size(0),
-    m_data((char*)malloc(1024))
-  {
-    if(m_data==NULL)
-      {
-	throw quicky_exception::quicky_runtime_exception("Not enough memory to allocate download buffer",__LINE__,__FILE__);
-      }
-  }
+    //------------------------------------------------------------------------------
+    download_buffer::download_buffer(void):
+            m_size(0),
+            m_data((char *) malloc(1024))
+    {
+        if (m_data == NULL)
+        {
+            throw quicky_exception::quicky_runtime_exception("Not enough memory to allocate download buffer",
+                                                             __LINE__,
+                                                             __FILE__
+                                                            );
+        }
+    }
 
-  //------------------------------------------------------------------------------
-  void download_buffer::clear(void)
-  {
-    m_size = 0;
-    free(m_data);
-    m_data = NULL;
-  }
+    //------------------------------------------------------------------------------
+    void
+    download_buffer::clear(void)
+    {
+        m_size = 0;
+        free(m_data);
+        m_data = NULL;
+    }
 
-  //------------------------------------------------------------------------------
-  void download_buffer::add_data(size_t p_size, void * p_data)
-  {
-    // Extend buffer to the new size
-    m_data = (char*)realloc(m_data,m_size + p_size + 1);
-    if(m_data == NULL)
-      {
-	throw quicky_exception::quicky_runtime_exception("Not enough memory to extend download buffer",__LINE__,__FILE__);
-      }
-    // Copy the new data in the buffer
-    memcpy(&(m_data[m_size]), p_data, p_size);
-    // Update size
-    m_size += p_size;
-    // Adding NULL chacacter at the end of buffer to be able to print it
-    m_data[m_size] = 0;
-  }
+    //------------------------------------------------------------------------------
+    void
+    download_buffer::add_data(size_t p_size,
+                              void *p_data
+                             )
+    {
+        // Extend buffer to the new size
+        m_data = (char *) realloc(m_data,
+                                  m_size + p_size + 1
+                                 );
+        if (m_data == NULL)
+        {
+            throw quicky_exception::quicky_runtime_exception("Not enough memory to extend download buffer",
+                                                             __LINE__,
+                                                             __FILE__
+                                                            );
+        }
+        // Copy the new data in the buffer
+        memcpy(&(m_data[m_size]),
+               p_data,
+               p_size
+              );
+        // Update size
+        m_size += p_size;
+        // Adding NULL chacacter at the end of buffer to be able to print it
+        m_data[m_size] = 0;
+    }
 
-  //------------------------------------------------------------------------------
-  const char * const download_buffer::get_data(void)const
-  {
-    return m_data;
-  }
+    //------------------------------------------------------------------------------
+    const char *const
+    download_buffer::get_data(void) const
+    {
+        return m_data;
+    }
 
-  //------------------------------------------------------------------------------
-  size_t download_buffer::get_size(void)const
-  {
-    return m_size;
-  }
+    //------------------------------------------------------------------------------
+    size_t
+    download_buffer::get_size(void) const
+    {
+        return m_size;
+    }
 
-  //------------------------------------------------------------------------------
-  download_buffer::~download_buffer(void)
-  {
-    free(m_data);
-  }
+    //------------------------------------------------------------------------------
+    download_buffer::~download_buffer(void)
+    {
+        free(m_data);
+    }
 }
 //EOF
