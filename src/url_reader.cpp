@@ -28,7 +28,8 @@
 namespace quicky_url_reader
 {
     //------------------------------------------------------------------------------
-    url_reader::url_reader(bool p_verbose_mode)
+    url_reader::url_reader(bool p_verbose_mode):
+    m_post_data("")
     {
         if (!m_nb_instance)
         {
@@ -117,6 +118,14 @@ namespace quicky_url_reader
         curl_easy_setopt(m_curl_handler,
                          CURLOPT_WRITEDATA,
                          (void *) &p_buffer);
+        if(m_post_data != "")
+        {
+            curl_easy_setopt(m_curl_handler, CURLOPT_POSTFIELDS, m_post_data.c_str());
+        }
+        else
+        {
+            curl_easy_setopt(m_curl_handler, CURLOPT_POSTFIELDSIZE, 0);
+        }
         CURLcode res = curl_easy_perform(m_curl_handler);
         if (res)
         {
@@ -394,6 +403,22 @@ namespace quicky_url_reader
                                                           );
         }
 
+    }
+
+    //------------------------------------------------------------------------------
+    void
+    url_reader::add_post_data(const std::string & p_name,
+                              const std::string & p_value
+                             )
+    {
+        add_parameter(m_post_data, p_name, p_value);
+    }
+
+    //------------------------------------------------------------------------------
+    void
+    url_reader::clear_post_data()
+    {
+        m_post_data = "";
     }
 
     //------------------------------------------------------------------------------

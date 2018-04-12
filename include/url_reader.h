@@ -104,12 +104,20 @@ namespace quicky_url_reader
                            const std::string & p_value
                           );
 
+        void clear_post_data();
+
+        void add_post_data(const std::string & p_name,
+                           const std::string & p_value
+                          );
+
         void set_cookie_file(const std::string & p_name);
 
         void set_user_agent(const std::string & p_user_agent);
 
         void set_referer(const std::string & p_referer);
       private:
+        std::string m_post_data;
+
         static size_t
         receive_data(void *p_buffer,
                      size_t p_size,
