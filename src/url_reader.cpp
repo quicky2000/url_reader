@@ -414,6 +414,18 @@ namespace quicky_url_reader
 
     //------------------------------------------------------------------------------
     void
+    url_reader::set_cookie_file(const std::string & p_name)
+    {
+        curl_easy_setopt(m_curl_handler,
+                         CURLOPT_COOKIESESSION,
+                         true);
+        curl_easy_setopt(m_curl_handler,
+                         CURLOPT_COOKIEJAR,
+                         p_name.c_str());
+    }
+
+    //------------------------------------------------------------------------------
+    void
     url_reader::set_user_agent(const std::string & p_user_agent)
     {
         curl_easy_setopt(m_curl_handler, CURLOPT_USERAGENT, p_user_agent.c_str());
