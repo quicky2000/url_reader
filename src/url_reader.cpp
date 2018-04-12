@@ -28,7 +28,7 @@
 namespace quicky_url_reader
 {
     //------------------------------------------------------------------------------
-    url_reader::url_reader(void)
+    url_reader::url_reader(bool p_verbose_mode)
     {
         if (!m_nb_instance)
         {
@@ -43,6 +43,12 @@ namespace quicky_url_reader
                                                                 );
             }
             m_curl_handler = curl_easy_init();
+            if(p_verbose_mode)
+            {
+                curl_easy_setopt(m_curl_handler,
+                                 CURLOPT_VERBOSE,
+                                 1L);
+            }
         }
         ++m_nb_instance;
     }

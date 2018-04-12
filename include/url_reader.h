@@ -84,7 +84,7 @@ namespace quicky_url_reader
         static char *
         escape_string(const char *p_str);
 
-        url_reader(void);
+        url_reader(bool p_verbose_mode=false);
 
         ~url_reader(void);
 
