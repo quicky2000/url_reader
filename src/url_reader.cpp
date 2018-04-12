@@ -396,6 +396,22 @@ namespace quicky_url_reader
 
     }
 
+    //------------------------------------------------------------------------------
+    void
+    url_reader::add_parameter(std::string & p_data,
+                              const std::string & p_name,
+                              const std::string & p_value
+                             )
+    {
+        char * l_escaped_value = curl_easy_escape(m_curl_handler, p_value.c_str(), 0);
+        if("" != p_data)
+        {
+            p_data += "&";
+        }
+        p_data += p_name + "=" + l_escaped_value;
+        curl_free(l_escaped_value);
+    }
+
     std::string url_reader::m_proxy;
     std::string url_reader::m_proxy_userpwd;
     CURL *url_reader::m_curl_handler = NULL;

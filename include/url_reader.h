@@ -99,6 +99,11 @@ namespace quicky_url_reader
                            bool p_disable_ssl_check = false
                           );
 
+        void add_parameter(std::string & p_data,
+                           const std::string & p_name,
+                           const std::string & p_value
+                          );
+
       private:
         static size_t
         receive_data(void *p_buffer,
