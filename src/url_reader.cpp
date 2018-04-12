@@ -29,7 +29,8 @@ namespace quicky_url_reader
 {
     //------------------------------------------------------------------------------
     url_reader::url_reader(bool p_verbose_mode):
-    m_post_data("")
+    m_post_data(""),
+    m_http_headers(nullptr)
     {
         if (!m_nb_instance)
         {
@@ -87,6 +88,7 @@ namespace quicky_url_reader
         {
             curl_easy_cleanup(m_curl_handler);
             curl_global_cleanup();
+            curl_slist_free_all(m_http_headers);
 #ifdef DEBUG_URL_READER
             std::cout << "libcurl cleanup done" << std::endl ;
 #endif
@@ -125,6 +127,10 @@ namespace quicky_url_reader
         else
         {
             curl_easy_setopt(m_curl_handler, CURLOPT_POSTFIELDSIZE, 0);
+        }
+        if(nullptr != m_http_headers)
+        {
+            curl_easy_setopt(m_curl_handler, CURLOPT_HTTPHEADER, m_http_headers);
         }
         CURLcode res = curl_easy_perform(m_curl_handler);
         if (res)
@@ -447,6 +453,24 @@ namespace quicky_url_reader
         curl_easy_setopt(m_curl_handler,
                          CURLOPT_COOKIEJAR,
                          p_name.c_str());
+    }
+
+    //------------------------------------------------------------------------------
+    void
+    url_reader::clear_http_headers()
+    {
+        curl_slist_free_all(m_http_headers);
+        m_http_headers = nullptr;
+    }
+
+    //------------------------------------------------------------------------------
+    void
+    url_reader::add_http_headers(const std::string & p_name,
+                                 const std::string & p_value
+                                )
+    {
+        std::string l_value = p_name + ": " + p_value;
+        m_http_headers = curl_slist_append(m_http_headers, l_value.c_str());
     }
 
     //------------------------------------------------------------------------------
