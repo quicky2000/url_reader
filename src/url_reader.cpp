@@ -412,6 +412,20 @@ namespace quicky_url_reader
         curl_free(l_escaped_value);
     }
 
+    //------------------------------------------------------------------------------
+    void
+    url_reader::set_user_agent(const std::string & p_user_agent)
+    {
+        curl_easy_setopt(m_curl_handler, CURLOPT_USERAGENT, p_user_agent.c_str());
+    }
+
+    //------------------------------------------------------------------------------
+    void
+    url_reader::set_referer(const std::string & p_referer)
+    {
+        curl_easy_setopt(m_curl_handler, CURLOPT_REFERER, p_referer.c_str());
+    }
+
     std::string url_reader::m_proxy;
     std::string url_reader::m_proxy_userpwd;
     CURL *url_reader::m_curl_handler = NULL;

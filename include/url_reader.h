@@ -104,6 +104,9 @@ namespace quicky_url_reader
                            const std::string & p_value
                           );
 
+        void set_user_agent(const std::string & p_user_agent);
+
+        void set_referer(const std::string & p_referer);
       private:
         static size_t
         receive_data(void *p_buffer,
